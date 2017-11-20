@@ -5,7 +5,7 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const fs = require('fs');
-
+const testFolder = '.././uploaded_images/';
 
 // Get our API routes
 const api = require('./server/routes/api');
@@ -39,9 +39,21 @@ app.get('/', (req, res) => {
 
 //viewing the images.
 app.get('/img', function(req, res) {
-  res.sendFile('/home/karthik/Documents/karthik/chrome_server/crowdhere_testing/uploaded_images/meena.jpg')
+var filenames = new Array();
+fs.readdir(testFolder, (err, files) => {
+  files.forEach(file => {
+    //console.log(file);
+filenames.push(file);
+  });
+res.send(filenames);
+})
+  //res.sendFile('/home/karthik/Documents/karthik/chrome_server/crowdhere_testing/uploaded_images/*.jpg')
 })
 
+
+app.get('/imgfile', function(req, res) {
+  res.sendFile('.././uploaded_images/'+req.query.image);
+})
 
 //post request for uploading the images
 app.post('/upload', function(req, res) {
@@ -55,7 +67,7 @@ app.post('/upload', function(req, res) {
 console.log(sampleFile.name);
  
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv('/home/karthik/Documents/karthik/chrome_server/crowdhere_testing/uploaded_images/'+sampleFile.name, function(err) {
+  sampleFile.mv('.././uploaded_images/'+sampleFile.name, function(err) {
     if (err)
       return res.status(500).send(err);
  
@@ -65,7 +77,7 @@ console.log(sampleFile.name);
 
 //get request for uploading the videos
 app.get('/video', function(req, res) {
-  const path = '/home/karthik/Documents/karthik/chrome_server/crowdhere_testing/uploaded_images/SampleVideo_1280x720_2mb.mp4'
+  const path = '.././uploaded_images/SampleVideo_1280x720_2mb.mp4'
   const stat = fs.statSync(path)
   const fileSize = stat.size
   const range = req.headers.range
