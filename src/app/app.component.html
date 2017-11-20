@@ -17,21 +17,44 @@
     <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
   </li>
 </ul>-->
+<style type="text/css">
+  .img-wrapper{
+    width: 23.5%;
+    display: inline-block;
+    float: left;
+    margin: 0 0 2% 2%;
+  }
+  .img-wrapper:nth-child(4n+1){ margin-left: 0; }
 
 
+</style>
 
+<div>
     <form ref='uploadForm' 
       id='uploadForm' 
       action='http://localhost:3000/upload' 
       method='post' 
       encType="multipart/form-data">
         <input type="file" name="sampleFile" />
-        <input type='submit' value='Upload!' />
+        <input type='submit' value='Upload!' (click)="refresh()"/>
     </form>     
+</div>
+
+<div class="wrapper">
+<div *ngFor="let data of images" class="img-wrapper">
+<img style="width:100%;" [src]="urlAppend(data)" class="img-rounded" alt="Cinque Terre" >
+</div>
+</div>
 
 
-<video id="videoPlayer" controls>
+<h2>video streaming example</h2>
+
+<div style="text-align: center;">
+<video id="videoPlayer" controls style="width:50%;">
   <source src="http://localhost:3000/video" type="video/mp4">
 </video>
+</div>
+
+
 
 
