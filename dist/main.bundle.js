@@ -94,7 +94,7 @@ var AppComponent = (function () {
         }
     };
     AppComponent.prototype.urlAppend = function (data) {
-        return 'http://localhost:3000/imgfile/?image=' + data;
+        return 'http://45.33.67.24:3000/imgfile/?image=' + data;
     };
     AppComponent.prototype.ngAfterViewInit = function () {
         this.getData();
@@ -184,10 +184,10 @@ var AppService = (function () {
         this.http = http;
     }
     AppService.prototype.fetchData = function (code) {
-        return this.http.get('http://localhost:3000/img').map(function (res) { return res.json(); });
+        return this.http.get('http://45.33.67.24:3000/img').map(function (res) { return res.json(); });
     };
     AppService.prototype.fetchImage = function (code) {
-        return this.http.get('http://localhost:3000/imgfile').map(function (res) { return res.json(); });
+        return this.http.get('http://45.33.67.24:3000/imgfile').map(function (res) { return res.json(); });
     };
     AppService = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Injectable */])(),
