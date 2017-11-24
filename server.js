@@ -5,7 +5,34 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const fs = require('fs');
-const testFolder = '.././uploaded_images/';
+var mysql = require('mysql');
+var firebase = require("firebase");
+const testFolder = '/home/karthik/Documents/karthik/chrome_server/crowdhere_testing/uploaded_images/';
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "fleet123",
+  database: "crowdhere"
+});
+
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
+
+
+
+//firebase configuration
+ var config = {
+    apiKey: "AIzaSyA8w0eWOImCc8avQp9LNStOOVjSlokZMkA",
+    authDomain: "nodejs-crowdhere.firebaseapp.com",
+    databaseURL: "https://nodejs-crowdhere.firebaseio.com",
+    projectId: "nodejs-crowdhere",
+    storageBucket: "nodejs-crowdhere.appspot.com",
+    messagingSenderId: "785429721248"
+  };
+  firebase.initializeApp(config);
 
 // Get our API routes
 const api = require('./server/routes/api');
@@ -37,12 +64,64 @@ app.get('/', (req, res) => {
 });
 
 
+
+// for creating the tables in mysql
+app.get('/create_table', function(req, res) {
+ var sql = "CREATE TABLE users (email varchar(50) primary key, password varchar(15))";
+ con.query(sql, function(err) {
+   if(err) 
+     console.log('users table already exists...')
+ })
+ res.write("user table & templates table created!");
+ res.end();
+})
+
+
+// signup api
+app.get('/signup',function(req, res) {
+firebase.auth().createUserWithEmailAndPassword(req.query.email, req.query.password).catch(function(error) {
+  var errorCode = error.code;
+  var errorMessage = error.message;
+res.status(500).send(error);
+ res.end()
+});
+ res.status(200).send("user created sucessfully");
+ res.end()
+})
+
+//login api
+app.get('/login', function(req, res){
+  firebase.auth().signInWithEmailAndPassword(req.query.email, req.query.password).then(function(data){
+console.log(data);
+res.status(200).send(data);
+ res.end()
+}).catch(function(error) {
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  res.write(errorCode+errorMessage);
+ res.end()
+  });
+})
+
+
+//forget username api
+app.get('/forget', function(req, res){
+firebase.auth().sendPasswordResetEmail(req.query.email).then(function(data){
+res.status(200).send('email sent sucessfully..');
+ res.end()
+}).catch(function(error){
+var errorCode = error.code;
+  var errorMessage = error.message;
+  res.status(500).send(error);
+ res.end()
+})
+})
+
 //viewing the images.
 app.get('/img', function(req, res) {
 var filenames = new Array();
 fs.readdir(testFolder, (err, files) => {
   files.forEach(file => {
-    //console.log(file);
 filenames.push(file);
   });
 res.send(filenames);
@@ -52,7 +131,7 @@ res.send(filenames);
 
 
 app.get('/imgfile', function(req, res) {
-  res.sendFile('.././uploaded_images/'+req.query.image);
+  res.sendFile('/home/karthik/Documents/karthik/chrome_server/crowdhere_testing/uploaded_images/'+req.query.image);
 })
 
 //post request for uploading the images
@@ -67,7 +146,7 @@ app.post('/upload', function(req, res) {
 console.log(sampleFile.name);
  
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv('.././uploaded_images/'+sampleFile.name, function(err) {
+  sampleFile.mv('/home/karthik/Documents/karthik/chrome_server/crowdhere_testing/uploaded_images/'+sampleFile.name, function(err) {
     if (err)
       return res.status(500).send(err);
  
@@ -77,7 +156,7 @@ console.log(sampleFile.name);
 
 //get request for uploading the videos
 app.get('/video', function(req, res) {
-  const path = '.././uploaded_images/SampleVideo_1280x720_2mb.mp4'
+  const path = '/home/karthik/Documents/karthik/chrome_server/crowdhere_testing/uploaded_images/SampleVideo_1280x720_2mb.mp4'
   const stat = fs.statSync(path)
   const fileSize = stat.size
   const range = req.headers.range
