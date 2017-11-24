@@ -351,7 +351,8 @@ var LoginComponent = (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
             selector: 'app-login',
             template: __webpack_require__("../../../../../src/app/login/login.component.html"),
-            styles: [__webpack_require__("../../../../../src/app/login/login.component.css")]
+            styles: [__webpack_require__("../../../../../src/app/login/login.component.css")],
+            providers: [__WEBPACK_IMPORTED_MODULE_1__login_service__["a" /* LoginService */]]
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__login_service__["a" /* LoginService */]])
     ], LoginComponent);
