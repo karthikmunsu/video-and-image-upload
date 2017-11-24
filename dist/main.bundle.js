@@ -296,7 +296,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/login/login.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "\n<div class=\"module form-module\">\n  \n  <div class=\"form\" *ngIf=\"show_login\">\n    <h2>Login to your account</h2>\n    <form>\n      <input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"username\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <button (click)=\"login(username, pwd)\">Login</button>\n      <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n  <div class=\"btn\"><a (click)=\"show_signup_section()\">Register</a></div>\n  <div class=\"cta\"><a (click)=\"forgot()\">Forgot your password?</a></div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_signup\">\n    <h2>Create an account</h2>\n    <form>\n      <!--<input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"\"/>-->\n      <input type=\"email\" placeholder=\"Email Address\" [(ngModel)]=\"sign_email\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"sign_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Cnf-Password\" [(ngModel)]=\"cnf_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <!--<input type=\"tel\" placeholder=\"Phone Number\" [(ngModel)]=\"mobilenumber\"/>-->\n      <button (click)=\"signup(sign_email, sign_pwd, cnf_pwd)\">Register</button>\n  <div class=\"btn\"><a (click)=\"showlogin()\">Signin</a></div>\n  <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n\n    <div *ngIf=\"success\" class=\"alert alert-success\"> \n        {{ success }} \n    </div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_forgot\">\n    <h2>Forgot Password?</h2>\n    <form>\n      <input type=\"email\" placeholder=\"Email Address\" [(ngModel)]=\"forgot_email\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <button (click)=\"forgetUser(forgot_email)\" (ngModelChange)=\"reset()\">Submit</button>\n      <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n\n    <div *ngIf=\"success\" class=\"alert alert-success\"> \n        {{ success }} \n    </div>\n    </form>\n  </div>\n\n\n</div>\n"
+module.exports = "\n<div class=\"module form-module\">\n  \n  <div class=\"form\" *ngIf=\"show_login\">\n    <h2>Login to your account</h2>\n    <form>\n      <input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"username\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <button (click)=\"login(username, pwd)\">Login</button>\n      <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n  <div class=\"btn\"><a (click)=\"show_signup_section()\">Register</a></div>\n  <div class=\"cta\"><a (click)=\"forgot()\">Forgot your password?</a></div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_signup\">\n    <h2>Create an account</h2>\n    <form>\n      <!--<input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"\"/>-->\n      <input type=\"email\" placeholder=\"Email Address\" [(ngModel)]=\"sign_email\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"sign_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Cnf-Password\" [(ngModel)]=\"cnf_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <!--<input type=\"tel\" placeholder=\"Phone Number\" [(ngModel)]=\"mobilenumber\"/>-->\n      <button (click)=\"signup(sign_email, sign_pwd, cnf_pwd)\">Register</button>\n  <div class=\"btn\"><a (click)=\"showlogin()\">Signin</a></div>\n  <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n\n    <div *ngIf=\"success\" class=\"alert alert-success\"> \n        {{ success }} \n    </div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_forgot\">\n    <h2>Forgot Password?</h2>\n    <form>\n      <input type=\"email\" placeholder=\"Email Address\" [(ngModel)]=\"forgot_email\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <button (click)=\"forgetUser(forgot_email)\" (ngModelChange)=\"reset()\">Submit</button>\n      <div class=\"btn\"><a (click)=\"showlogin()\">Signin</a></div>\n      <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n\n    <div *ngIf=\"success\" class=\"alert alert-success\"> \n        {{ success }} \n    </div>\n    </form>\n  </div>\n\n\n</div>\n"
 
 /***/ }),
 
@@ -335,6 +335,7 @@ var LoginComponent = (function () {
     LoginComponent.prototype.showlogin = function () {
         this.show_login = true;
         this.show_signup = false;
+        this.show_forgot = false;
         this.reset();
     };
     LoginComponent.prototype.forgot = function () {
@@ -381,17 +382,24 @@ var LoginComponent = (function () {
     };
     LoginComponent.prototype.forgetUser = function (email) {
         var _this = this;
-        this.loginService.authForgot(email).subscribe(function (res) {
-            console.log(res);
-            _this.success = "kindly check your email for reset password link.";
-            setInterval(function () {
-                _this.success = null;
-                _this.showlogin();
-            }, 1000 * 3);
-        }, function (err) {
-            console.log(err);
-            _this.errors = "email is not present!";
-        });
+        var regexp = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+        if (regexp.test(email)) {
+            this.loginService.authForgot(email).subscribe(function (res) {
+                console.log(res);
+                _this.success = "kindly check your email for reset password link.";
+                setInterval(function () {
+                    _this.success = null;
+                    _this.show_forgot = false;
+                    _this.showlogin();
+                }, 1000 * 3);
+            }, function (err) {
+                console.log(err);
+                _this.errors = "email is not present!";
+            });
+        }
+        else {
+            this.errors = "Enter a valid email.";
+        }
     };
     LoginComponent.prototype.reset = function () {
         this.success = null;
