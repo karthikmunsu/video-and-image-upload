@@ -79,20 +79,21 @@ app.get('/create_table', function(req, res) {
 
 // signup api
 app.get('/signup',function(req, res) {
-firebase.auth().createUserWithEmailAndPassword(req.query.email, req.query.password).catch(function(error) {
+firebase.auth().createUserWithEmailAndPassword(req.query.email, req.query.password).then(function(data){
+  res.status(200).send({message: "user created sucessfully"});
+  res.end()
+}).catch(function(error) {
   var errorCode = error.code;
   var errorMessage = error.message;
-res.status(500).send(error);
- res.end()
+  res.status(500).send(error);
+  res.end()
 });
- res.status(200).send("user created sucessfully");
- res.end()
+ 
 })
 
 //login api
 app.get('/login', function(req, res){
   firebase.auth().signInWithEmailAndPassword(req.query.email, req.query.password).then(function(data){
-console.log(data);
 res.status(200).send(data);
  res.end()
 }).catch(function(error) {

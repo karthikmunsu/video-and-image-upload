@@ -296,7 +296,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/login/login.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "\n<div class=\"module form-module\">\n  \n  <div class=\"form\" *ngIf=\"show_login\">\n    <h2>Login to your account</h2>\n    <form>\n      <input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"username\" [ngModelOptions]=\"{standalone: true}\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"pwd\" [ngModelOptions]=\"{standalone: true}\"/>\n      <button (click)=\"login(username, pwd)\">Login</button>\n  <div class=\"btn\"><a (click)=\"signup()\">Register</a></div>\n  <div class=\"cta\"><a (click)=\"forgot()\">Forgot your password?</a></div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_signup\">\n    <h2>Create an account</h2>\n    <form>\n      <input type=\"text\" placeholder=\"Username\"/>\n      <input type=\"password\" placeholder=\"Password\"/>\n      <input type=\"email\" placeholder=\"Email Address\"/>\n      <input type=\"tel\" placeholder=\"Phone Number\"/>\n      <button>Register</button>\n  <div class=\"btn\"><a (click)=\"showlogin()\">Signin</a></div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_forgot\">\n    <h2>Forgot Password?</h2>\n    <form>\n      <input type=\"email\" placeholder=\"Email Address\"/>\n      <button>Submit</button>\n    </form>\n  </div>\n\n\n</div>\n"
+module.exports = "\n<div class=\"module form-module\">\n  \n  <div class=\"form\" *ngIf=\"show_login\">\n    <h2>Login to your account</h2>\n    <form>\n      <input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"username\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <button (click)=\"login(username, pwd)\">Login</button>\n      <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n  <div class=\"btn\"><a (click)=\"show_signup_section()\">Register</a></div>\n  <div class=\"cta\"><a (click)=\"forgot()\">Forgot your password?</a></div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_signup\">\n    <h2>Create an account</h2>\n    <form>\n      <!--<input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"\"/>-->\n      <input type=\"email\" placeholder=\"Email Address\" [(ngModel)]=\"sign_email\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"sign_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Cnf-Password\" [(ngModel)]=\"cnf_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <!--<input type=\"tel\" placeholder=\"Phone Number\" [(ngModel)]=\"mobilenumber\"/>-->\n      <button (click)=\"signup(sign_email, sign_pwd, cnf_pwd)\">Register</button>\n  <div class=\"btn\"><a (click)=\"showlogin()\">Signin</a></div>\n  <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n\n    <div *ngIf=\"success\" class=\"alert alert-success\"> \n        {{ success }} \n    </div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_forgot\">\n    <h2>Forgot Password?</h2>\n    <form>\n      <input type=\"email\" placeholder=\"Email Address\"/>\n      <button>Submit</button>\n    </form>\n  </div>\n\n\n</div>\n"
 
 /***/ }),
 
@@ -327,7 +327,7 @@ var LoginComponent = (function () {
     }
     LoginComponent.prototype.ngOnInit = function () {
     };
-    LoginComponent.prototype.signup = function () {
+    LoginComponent.prototype.show_signup_section = function () {
         this.show_login = false;
         this.show_signup = true;
     };
@@ -341,11 +341,41 @@ var LoginComponent = (function () {
         this.show_forgot = true;
     };
     LoginComponent.prototype.login = function (username, pwd) {
+        var _this = this;
         this.loginService.authLogin(username, pwd).subscribe(function (res) {
             console.log(res);
         }, function (err) {
-            console.log(err);
+            //console.log(err);
+            _this.errors = "username or password is wrong!";
         });
+    };
+    LoginComponent.prototype.signup = function (email, pwd, cnfpwd) {
+        var _this = this;
+        var regexp = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+        if (regexp.test(email)) {
+            if (cnfpwd !== pwd) {
+                this.errors = "password and cnf-pwd doesnt match..";
+            }
+            else {
+                this.loginService.authSignup(email, pwd).subscribe(function (res) {
+                    console.log(res);
+                    _this.success = "Registered Sucessfully";
+                    setInterval(function () {
+                        this.success = null;
+                        this.showlogin();
+                    }, 3000);
+                }, function (err) {
+                    console.log(err);
+                    _this.errors = "contact admin to signup!";
+                });
+            }
+        }
+        else {
+            this.errors = "enter a valid email address.";
+        }
+    };
+    LoginComponent.prototype.reset = function () {
+        this.errors = null;
     };
     LoginComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
@@ -389,6 +419,9 @@ var LoginService = (function () {
     }
     LoginService.prototype.authLogin = function (email, password) {
         return this.http.get('http://45.33.67.24:3000/login?email=' + email + '&password=' + password).map(function (res) { return res.json(); });
+    };
+    LoginService.prototype.authSignup = function (email, password) {
+        return this.http.get('http://45.33.67.24:3000/signup?email=' + email + '&password=' + password).map(function (res) { return res.json(); });
     };
     LoginService = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
