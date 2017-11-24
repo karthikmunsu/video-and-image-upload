@@ -296,7 +296,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/login/login.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "\n<div class=\"module form-module\">\n  \n  <div class=\"form\" *ngIf=\"show_login\">\n    <h2>Login to your account</h2>\n    <form>\n      <input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"username\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <button (click)=\"login(username, pwd)\">Login</button>\n      <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n  <div class=\"btn\"><a (click)=\"show_signup_section()\">Register</a></div>\n  <div class=\"cta\"><a (click)=\"forgot()\">Forgot your password?</a></div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_signup\">\n    <h2>Create an account</h2>\n    <form>\n      <!--<input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"\"/>-->\n      <input type=\"email\" placeholder=\"Email Address\" [(ngModel)]=\"sign_email\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"sign_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Cnf-Password\" [(ngModel)]=\"cnf_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <!--<input type=\"tel\" placeholder=\"Phone Number\" [(ngModel)]=\"mobilenumber\"/>-->\n      <button (click)=\"signup(sign_email, sign_pwd, cnf_pwd)\">Register</button>\n  <div class=\"btn\"><a (click)=\"showlogin()\">Signin</a></div>\n  <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n\n    <div *ngIf=\"success\" class=\"alert alert-success\"> \n        {{ success }} \n    </div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_forgot\">\n    <h2>Forgot Password?</h2>\n    <form>\n      <input type=\"email\" placeholder=\"Email Address\"/>\n      <button>Submit</button>\n    </form>\n  </div>\n\n\n</div>\n"
+module.exports = "\n<div class=\"module form-module\">\n  \n  <div class=\"form\" *ngIf=\"show_login\">\n    <h2>Login to your account</h2>\n    <form>\n      <input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"username\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <button (click)=\"login(username, pwd)\">Login</button>\n      <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n  <div class=\"btn\"><a (click)=\"show_signup_section()\">Register</a></div>\n  <div class=\"cta\"><a (click)=\"forgot()\">Forgot your password?</a></div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_signup\">\n    <h2>Create an account</h2>\n    <form>\n      <!--<input type=\"text\" placeholder=\"Username\" [(ngModel)]=\"\"/>-->\n      <input type=\"email\" placeholder=\"Email Address\" [(ngModel)]=\"sign_email\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Password\" [(ngModel)]=\"sign_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <input type=\"password\" placeholder=\"Cnf-Password\" [(ngModel)]=\"cnf_pwd\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <!--<input type=\"tel\" placeholder=\"Phone Number\" [(ngModel)]=\"mobilenumber\"/>-->\n      <button (click)=\"signup(sign_email, sign_pwd, cnf_pwd)\">Register</button>\n  <div class=\"btn\"><a (click)=\"showlogin()\">Signin</a></div>\n  <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n\n    <div *ngIf=\"success\" class=\"alert alert-success\"> \n        {{ success }} \n    </div>\n    </form>\n  </div>\n  <div class=\"form\" *ngIf=\"show_forgot\">\n    <h2>Forgot Password?</h2>\n    <form>\n      <input type=\"email\" placeholder=\"Email Address\" [(ngModel)]=\"forgot_email\" [ngModelOptions]=\"{standalone: true}\" (ngModelChange)=\"reset()\"/>\n      <button (click)=\"forgetUser(forgot_email)\" (ngModelChange)=\"reset()\">Submit</button>\n      <div *ngIf=\"errors\" class=\"alert alert-danger\"> \n        {{ errors }} \n    </div>\n\n    <div *ngIf=\"success\" class=\"alert alert-success\"> \n        {{ success }} \n    </div>\n    </form>\n  </div>\n\n\n</div>\n"
 
 /***/ }),
 
@@ -330,15 +330,18 @@ var LoginComponent = (function () {
     LoginComponent.prototype.show_signup_section = function () {
         this.show_login = false;
         this.show_signup = true;
+        this.reset();
     };
     LoginComponent.prototype.showlogin = function () {
         this.show_login = true;
         this.show_signup = false;
+        this.reset();
     };
     LoginComponent.prototype.forgot = function () {
         this.show_login = false;
         this.show_signup = false;
         this.show_forgot = true;
+        //this.Registered();
     };
     LoginComponent.prototype.login = function (username, pwd) {
         var _this = this;
@@ -351,6 +354,7 @@ var LoginComponent = (function () {
     };
     LoginComponent.prototype.signup = function (email, pwd, cnfpwd) {
         var _this = this;
+        this.reset();
         var regexp = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
         if (regexp.test(email)) {
             if (cnfpwd !== pwd) {
@@ -360,13 +364,14 @@ var LoginComponent = (function () {
                 this.loginService.authSignup(email, pwd).subscribe(function (res) {
                     console.log(res);
                     _this.success = "Registered Sucessfully";
+                    _this.clearSignup();
                     setInterval(function () {
-                        this.success = null;
-                        this.showlogin();
-                    }, 3000);
+                        _this.success = null;
+                        _this.showlogin();
+                    }, 1000 * 3);
                 }, function (err) {
-                    console.log(err);
-                    _this.errors = "contact admin to signup!";
+                    console.log(err._body);
+                    _this.errors = "email-already-in-use";
                 });
             }
         }
@@ -374,8 +379,28 @@ var LoginComponent = (function () {
             this.errors = "enter a valid email address.";
         }
     };
+    LoginComponent.prototype.forgetUser = function (email) {
+        var _this = this;
+        this.loginService.authForgot(email).subscribe(function (res) {
+            console.log(res);
+            _this.success = "kindly check your email for reset password link.";
+            setInterval(function () {
+                _this.success = null;
+                _this.showlogin();
+            }, 1000 * 3);
+        }, function (err) {
+            console.log(err);
+            _this.errors = "email is not present!";
+        });
+    };
     LoginComponent.prototype.reset = function () {
+        this.success = null;
         this.errors = null;
+    };
+    LoginComponent.prototype.clearSignup = function () {
+        this.sign_email = "";
+        this.sign_pwd = "";
+        this.cnf_pwd = "";
     };
     LoginComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
@@ -422,6 +447,9 @@ var LoginService = (function () {
     };
     LoginService.prototype.authSignup = function (email, password) {
         return this.http.get('http://45.33.67.24:3000/signup?email=' + email + '&password=' + password).map(function (res) { return res.json(); });
+    };
+    LoginService.prototype.authForgot = function (email) {
+        return this.http.get('http://45.33.67.24:3000/forget?email=' + email).map(function (res) { return res.json(); });
     };
     LoginService = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),

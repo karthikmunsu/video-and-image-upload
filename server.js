@@ -83,8 +83,6 @@ firebase.auth().createUserWithEmailAndPassword(req.query.email, req.query.passwo
   res.status(200).send({message: "user created sucessfully"});
   res.end()
 }).catch(function(error) {
-  var errorCode = error.code;
-  var errorMessage = error.message;
   res.status(500).send(error);
   res.end()
 });
@@ -97,9 +95,7 @@ app.get('/login', function(req, res){
 res.status(200).send(data);
  res.end()
 }).catch(function(error) {
-  var errorCode = error.code;
-  var errorMessage = error.message;
-  res.write(errorCode+errorMessage);
+  res.status(500).send(error);
  res.end()
   });
 })
@@ -108,11 +104,9 @@ res.status(200).send(data);
 //forget username api
 app.get('/forget', function(req, res){
 firebase.auth().sendPasswordResetEmail(req.query.email).then(function(data){
-res.status(200).send('email sent sucessfully..');
+res.status(200).send(data);
  res.end()
 }).catch(function(error){
-var errorCode = error.code;
-  var errorMessage = error.message;
   res.status(500).send(error);
  res.end()
 })
